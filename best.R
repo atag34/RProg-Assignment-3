@@ -8,23 +8,21 @@ columns <- c("Hospital.Name", "State",
              "Hospital.30.Day.Death..Mortality..Rates.from.Heart.Failure",
              "Hospital.30.Day.Death..Mortality..Rates.from.Pneumonia")
 data <- subset.data.frame(outcomes,select = columns)
-colnames(data) = c("Hospital","State","HeartAttack","HeartFailure","Pneumonia");
+colnames(data) = c("Hospital","State","heart attack","heart failure","pneumonia");
   ## Check that state and outcome are valid
 if(!state %in% data[,2]){ 
-    stop("state invalid")
-} else if (!outcome %in% c("HeartAttack", "HeartFailure", "Pneumonia")){ 
-    stop("outcome invalid")
+    stop("invalid state")
+} else if (!outcome %in% c("heart attack", "heart failure", "pneumonia")){ 
+    stop("invalid outcome")
 }
   ## Return hospital name in that state with lowest 30-day death
-  else {
-  ds <- subset(data, State == state);
-  ds <- subset(ds, select = c("Hospital",outcome));
-  ds <- as.numeric(ds[,outcome])
-  bad <- is.na(ds)
-  ds <- ds[!bad, ]
-  ds <- arrange_(ds,outcome, "Hospital")
-  }
+data <- filter(data, State == state)
+cols <-  grep(outcome, colnames(data), value = TRUE)
+cols <- c("Hospital", "State",cols)
+datase <- subset(data, select = cols)
+datase <- na.omit(datase)
+datase[,3] <- suppressWarnings(as.numeric(datase[,3]))
+datase <- datase[order(datase[,3]), ]
   ## rate
-print(ds[1,1])
-tail(ds)
+print(datase[1,1])
 }
